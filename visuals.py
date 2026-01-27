@@ -18,15 +18,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# -----------------------------
+
 # Title & description
-# -----------------------------
-st.title("🏆 Top Food Apps on Google Play Store")
+st.title("Top Food Apps on Google Play Store")
 st.caption("Analysis based on ratings, reviews, and sentiment polarity")
 
-# -----------------------------
 # Load data from SQLite
-# -----------------------------
 @st.cache_data
 def load_data():
     conn = sqlite3.connect("market_research")  # Update if your DB has an extension
@@ -43,24 +40,21 @@ def load_data():
 
 df = load_data()
 
-# -----------------------------
+
 # Show full dataset first
-# -----------------------------
 st.subheader("📋 All App Data")
 st.dataframe(
     df[["App", "Rating", "Reviews", "Sentiment_Polarity"]].sort_values("Rating", ascending=False),
     use_container_width=True
 )
 
-# -----------------------------
 # KPI metrics
-# -----------------------------
 col1, col2, col3 = st.columns(3)
 
-col1.metric("⭐ Average Rating", round(df["Rating"].mean(), 2))
-col2.metric("📱 Total Apps", len(df))
+col1.metric(" Average Rating", round(df["Rating"].mean(), 2))
+col2.metric("Total Apps", len(df))
 col3.metric(
-    "🧠 Avg Sentiment",
+    " Avg Sentiment",
     round(df["Sentiment_Polarity"].mean(), 2)
     if df["Sentiment_Polarity"].notna().any()
     else "N/A"
@@ -68,9 +62,8 @@ col3.metric(
 
 st.divider()
 
-# -----------------------------
+
 # Sidebar filters
-# -----------------------------
 st.sidebar.header("Filters")
 
 min_rating = st.sidebar.slider(
@@ -91,17 +84,13 @@ top_n = st.sidebar.slider(
 # Filter dataframe based on slider
 filtered_df = df[df["Rating"] >= min_rating]
 
-# -----------------------------
 # Top apps by rating
-# -----------------------------
-st.subheader("⭐ Top Apps by Rating")
+st.subheader(" Top Apps by Rating")
 top_rated = filtered_df.sort_values("Rating", ascending=False).head(top_n)
 st.bar_chart(top_rated.set_index("App")["Rating"])
 
-# -----------------------------
 # Rating vs Reviews (scatter)
-# -----------------------------
-st.subheader("📊 Rating vs Reviews")
+st.subheader(" Rating vs Reviews")
 rating_reviews_chart = alt.Chart(filtered_df).mark_circle(size=130).encode(
     x=alt.X(
         "Reviews",
@@ -117,12 +106,10 @@ rating_reviews_chart = alt.Chart(filtered_df).mark_circle(size=130).encode(
 ).interactive()
 st.altair_chart(rating_reviews_chart, use_container_width=True)
 
-# -----------------------------
 # Sentiment analysis
-# -----------------------------
 sentiment_df = filtered_df.dropna(subset=["Sentiment_Polarity"])
 if not sentiment_df.empty:
-    st.subheader("🧠 User Sentiment Polarity")
+    st.subheader("User Sentiment Polarity")
     sentiment_chart = alt.Chart(sentiment_df).mark_bar().encode(
         x=alt.X("Sentiment_Polarity", title="Sentiment Polarity"),
         y=alt.Y("App", sort="-x"),
@@ -130,13 +117,4 @@ if not sentiment_df.empty:
     )
     st.altair_chart(sentiment_chart, use_container_width=True)
 
-# -----------------------------
-# Optional: Download filtered data
-# -----------------------------
-st.subheader("⬇️ Download Filtered Data")
-st.download_button(
-    label="Download as CSV",
-    data=filtered_df[["App", "Rating", "Reviews", "Sentiment_Polarity"]].to_csv(index=False),
-    file_name="top_playstore_food_apps.csv",
-    mime="text/csv"
-)
+
