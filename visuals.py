@@ -42,7 +42,7 @@ df = load_data()
 
 
 # Show full dataset first
-st.subheader("📋 All App Data")
+st.subheader("All App Data")
 st.dataframe(
     df[["App", "Rating", "Reviews", "Sentiment_Polarity"]].sort_values("Rating", ascending=False),
     use_container_width=True
@@ -116,5 +116,6 @@ if not sentiment_df.empty:
         tooltip=["App", "Sentiment_Polarity"]
     )
     st.altair_chart(sentiment_chart, use_container_width=True)
+
 
 
