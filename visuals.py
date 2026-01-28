@@ -10,9 +10,7 @@ import pandas as pd
 import sqlite3
 import altair as alt
 
-# -----------------------------
 # Page config
-# -----------------------------
 st.set_page_config(
     page_title="Top Play Store Food Apps",
     layout="wide"
@@ -45,7 +43,7 @@ df = load_data()
 st.subheader("All App Data")
 st.dataframe(
     df[["App", "Rating", "Reviews", "Sentiment_Polarity"]].sort_values("Rating", ascending=False),
-    use_container_width=True
+    use_width="stretch"
 )
 
 # KPI metrics
@@ -85,26 +83,36 @@ top_n = st.sidebar.slider(
 filtered_df = df[df["Rating"] >= min_rating]
 
 # # Top apps by rating
-# st.subheader(" Top Apps by Rating")
-# top_rated = filtered_df.sort_values("Rating", ascending=False).head(top_n)
-# st.bar_chart(top_rated.set_index("App")["Rating"])
+st.subheader("Ratings and Reviews Trend")
 
-# # Rating vs Reviews (scatter)
-# st.subheader(" Rating vs Reviews")
-# rating_reviews_chart = alt.Chart(filtered_df).mark_circle(size=130).encode(
-#     x=alt.X(
-#         "Reviews",
-#         scale=alt.Scale(type="log"),
-#         title="Number of Reviews (log scale)"
-#     ),
-#     y=alt.Y(
-#         "Rating",
-#         scale=alt.Scale(domain=[4.4, 5.0]),
-#         title="Rating"
-#     ),
-#     tooltip=["App", "Rating", "Reviews", "Sentiment_Polarity"]
-# ).interactive()
-# st.altair_chart(rating_reviews_chart, use_container_width=True)
+line_data = filtered_df.sort_values("Rating", ascending=False)
+
+rating_line = alt.Chart(line_data).mark_line(point=True).encode(
+    x=alt.X("App:N", sort="-y", title="App"),
+    y=alt.Y("Rating:Q", title="Rating"),
+    color=alt.value("#1f77b4"),
+    tooltip=["App", "Rating"]
+)
+
+reviews_line = alt.Chart(line_data).mark_line(point=True).encode(
+    x=alt.X("App:N", sort="-y"),
+    y=alt.Y(
+        "Reviews:Q",
+        title="Number of Reviews",
+        scale=alt.Scale(type="log")
+    ),
+    color=alt.value("#ff7f0e"),
+    tooltip=["App", "Reviews"]
+)
+
+combined_chart = alt.layer(
+    rating_line,
+    reviews_line
+).resolve_scale(
+    y="independent"
+)
+
+st.altair_chart(combined_chart, use_container_width=True)
 
 # Sentiment analysis
 sentiment_df = filtered_df.dropna(subset=["Sentiment_Polarity"])
@@ -116,6 +124,7 @@ if not sentiment_df.empty:
         tooltip=["App", "Sentiment_Polarity"]
     )
     st.altair_chart(sentiment_chart, use_container_width=True)
+
 
 
 
