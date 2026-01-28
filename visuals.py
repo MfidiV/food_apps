@@ -43,7 +43,7 @@ df = load_data()
 st.subheader("All App Data")
 st.dataframe(
     df[["App", "Rating", "Reviews", "Sentiment_Polarity"]].sort_values("Rating", ascending=False),
-    use_width="stretch"
+    use_container_width =True
 )
 
 # KPI metrics
@@ -124,6 +124,7 @@ if not sentiment_df.empty:
         tooltip=["App", "Sentiment_Polarity"]
     )
     st.altair_chart(sentiment_chart, use_container_width=True)
+
 
 
 
