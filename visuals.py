@@ -84,27 +84,27 @@ top_n = st.sidebar.slider(
 # Filter dataframe based on slider
 filtered_df = df[df["Rating"] >= min_rating]
 
-# Top apps by rating
-st.subheader(" Top Apps by Rating")
-top_rated = filtered_df.sort_values("Rating", ascending=False).head(top_n)
-st.bar_chart(top_rated.set_index("App")["Rating"])
+# # Top apps by rating
+# st.subheader(" Top Apps by Rating")
+# top_rated = filtered_df.sort_values("Rating", ascending=False).head(top_n)
+# st.bar_chart(top_rated.set_index("App")["Rating"])
 
-# Rating vs Reviews (scatter)
-st.subheader(" Rating vs Reviews")
-rating_reviews_chart = alt.Chart(filtered_df).mark_circle(size=130).encode(
-    x=alt.X(
-        "Reviews",
-        scale=alt.Scale(type="log"),
-        title="Number of Reviews (log scale)"
-    ),
-    y=alt.Y(
-        "Rating",
-        scale=alt.Scale(domain=[4.4, 5.0]),
-        title="Rating"
-    ),
-    tooltip=["App", "Rating", "Reviews", "Sentiment_Polarity"]
-).interactive()
-st.altair_chart(rating_reviews_chart, use_container_width=True)
+# # Rating vs Reviews (scatter)
+# st.subheader(" Rating vs Reviews")
+# rating_reviews_chart = alt.Chart(filtered_df).mark_circle(size=130).encode(
+#     x=alt.X(
+#         "Reviews",
+#         scale=alt.Scale(type="log"),
+#         title="Number of Reviews (log scale)"
+#     ),
+#     y=alt.Y(
+#         "Rating",
+#         scale=alt.Scale(domain=[4.4, 5.0]),
+#         title="Rating"
+#     ),
+#     tooltip=["App", "Rating", "Reviews", "Sentiment_Polarity"]
+# ).interactive()
+# st.altair_chart(rating_reviews_chart, use_container_width=True)
 
 # Sentiment analysis
 sentiment_df = filtered_df.dropna(subset=["Sentiment_Polarity"])
@@ -116,6 +116,7 @@ if not sentiment_df.empty:
         tooltip=["App", "Sentiment_Polarity"]
     )
     st.altair_chart(sentiment_chart, use_container_width=True)
+
 
 
 
