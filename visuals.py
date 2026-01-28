@@ -83,37 +83,29 @@ top_n = st.sidebar.slider(
 filtered_df = df[df["Rating"] >= min_rating]
 
 # # Top apps by rating
-st.subheader("Ratings and Reviews Trend")
+st.subheader("App Quality vs Popularity")
 
-line_data = filtered_df.sort_values("Rating", ascending=False)
-
-rating_line = alt.Chart(line_data).mark_line(point=True).encode(
-    x=alt.X("App:N", sort="-y", title="App"),
-    y=alt.Y("Rating:Q", title="Rating"),
-    color=alt.value("#1f77b4"),
-    tooltip=["App", "Rating"]
-)
-
-reviews_line = alt.Chart(line_data).mark_line(point=True).encode(
-    x=alt.X("App:N", sort="-y"),
-    y=alt.Y(
+bubble_chart = alt.Chart(filtered_df).mark_circle(opacity=0.7).encode(
+    x=alt.X(
         "Reviews:Q",
-        title="Number of Reviews",
-        scale=alt.Scale(type="log")
+        scale=alt.Scale(type="log"),
+        title="Number of Reviews (log scale)"
     ),
-    color=alt.value("#ff7f0e"),
-    tooltip=["App", "Reviews"]
-)
+    y=alt.Y(
+        "Rating:Q",
+        scale=alt.Scale(domain=[4.4, 5.0]),
+        title="Rating"
+    ),
+    size=alt.Size(
+        "Sentiment_Polarity:Q",
+        title="Sentiment Polarity",
+        scale=alt.Scale(range=[100, 2000])
+    ),
+    color=alt.Color("App:N", legend=None),
+    tooltip=["App", "Rating", "Reviews", "Sentiment_Polarity"]
+).interactive()
 
-combined_chart = alt.layer(
-    rating_line,
-    reviews_line
-).resolve_scale(
-    y="independent"
-)
-
-st.altair_chart(combined_chart, use_container_width=True)
-
+st.altair_chart(bubble_chart, use_container_width=True)
 # Sentiment analysis
 sentiment_df = filtered_df.dropna(subset=["Sentiment_Polarity"])
 if not sentiment_df.empty:
@@ -124,6 +116,7 @@ if not sentiment_df.empty:
         tooltip=["App", "Sentiment_Polarity"]
     )
     st.altair_chart(sentiment_chart, use_container_width=True)
+
 
 
 
